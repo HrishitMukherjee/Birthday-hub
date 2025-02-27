@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>WhatsApp Birthday Hub</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #photoGallery img { width: 80px; height: 80px; object-fit: cover; margin: 5px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🎉 Birthday Hub</h1>
+    <h3>Upload a Birthday Photo:</h3>
+    <input type="file" accept="image/*" onchange="uploadPhoto(event)">
+    <div id="photoGallery">Loading photos...</div>
+
+    <script>
+        // 🔥 Paste your Firebase config here (replace this with yours!)
+        const firebaseConfig = {
+  apiKey: "AIzaSyAv4AKAT9xG8If0ckne8fKV6wK7Pdah1y4",
+  authDomain: "group-birthdays.firebaseapp.com",
+  databaseURL: "https://group-birthdays-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "group-birthdays",
+  storageBucket: "group-birthdays.firebasestorage.app",
+  messagingSenderId: "895352848500",
+  appId: "1:895352848500:web:c16593f81fbe633d75d121",
+  measurementId: "G-8S4TD7LZDH"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Upload photo to Firebase
+        function uploadPhoto(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                const photoURL = reader.result;
+                db.ref('photos').push(photoURL); // Save the photo URL in the database
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Load photos in real-time
+        function loadPhotos() {
+            const gallery = document.getElementById('photoGallery');
+            db.ref('photos').on('value', (snapshot) => {
+                gallery.innerHTML = '';
+                snapshot.forEach((photo) => {
+                    const img = document.createElement('img');
+                    img.src = photo.val();
+                    gallery.appendChild(img);
+                });
+            });
+        }
+
+        loadPhotos();  // Load photos when page opens
+    </script>
+</body>
+</html>
